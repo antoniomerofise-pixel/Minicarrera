@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carrera de Coches</title>
+  <style>
+    body { margin: 0; background: #333; }
+    canvas { display: block; margin: auto; background: #555; }
+  </style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="600"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let car = { x: 180, y: 500, w: 40, h: 60 };
+let obstacles = [];
+let speed = 3;
+let gameOver = false;
+
+// Controles
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") car.x -= 20;
+  if (e.key === "ArrowRight") car.x += 20;
+});
+
+// Crear obstáculos
+function spawnObstacle() {
+  let x = Math.random() * 360;
+  obstacles.push({ x: x, y: -60, w: 40, h: 60 });
+}
+setInterval(spawnObstacle, 1000);
+
+// Detectar colisión
+function crash(a, b) {
+  return a.x < b.x + b.w &&
+         a.x + a.w > b.x &&
+         a.y < b.y + b.h &&
+         a.y + a.h > b.y;
+}
+
+// Bucle del juego
+function update() {
+  if (gameOver) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Dibujar coche
+  ctx.fillStyle = "red";
+  ctx.fillRect(car.x, car.y, car.w, car.h);
+
+  // Dibujar obstáculos
+  ctx.fillStyle = "black";
+  for (let i = 0; i < obstacles.length; i++) {
+    let o = obstacles[i];
+    o.y += speed;
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+
+    if (crash(car, o)) {
+      gameOver = true;
+      alert("¡Has perdido!");
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
